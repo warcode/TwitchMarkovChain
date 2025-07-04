@@ -88,7 +88,7 @@ class Database:
     """
 
     def __init__(self, channel: str):
-        self.db_name = f"MarkovChain_{channel.replace('#', '').lower()}.db"
+        self.db_name = f"/db/MarkovChain_{channel.replace('#', '').lower()}.db"
         self._execute_queue = []
 
         if os.path.isfile(self.db_name):
