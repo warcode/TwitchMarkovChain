@@ -155,9 +155,9 @@ class Database:
             def progress(status, remaining, total):
                 logging.debug(f'Copied {total-remaining} of {total} pages...')
             conn = sqlite3.connect(
-                f"MarkovChain_{channel.replace('#', '').lower()}.db")
+                f"/db/MarkovChain_{channel.replace('#', '').lower()}.db")
             back_conn = sqlite3.connect(
-                f"MarkovChain_{channel.replace('#', '').lower()}_backup.db")
+                f"/db/MarkovChain_{channel.replace('#', '').lower()}_backup.db")
             with back_conn:
                 conn.backup(back_conn, pages=1000, progress=progress)
             conn.close()
@@ -307,7 +307,7 @@ class Database:
                 f"Created a copy of the database called \"MarkovChain_{channel}_modified.db\". The update will modify this file.")
 
             # Temporarily set self.db_name to the modified one
-            self.db_name = f"MarkovChain_{channel.replace('#', '').lower()}_modified.db"
+            self.db_name = f"/db/MarkovChain_{channel.replace('#', '').lower()}_modified.db"
 
             # Create database tables.
             for first_char in list(string.ascii_uppercase) + ["_"]:
@@ -450,7 +450,7 @@ class Database:
                       f"MarkovChain_{channel}.db")
 
             # Revert to using .db instead of _modified.db
-            self.db_name = f"MarkovChain_{channel.replace('#', '').lower()}.db"
+            self.db_name = f"/db/MarkovChain_{channel.replace('#', '').lower()}.db"
 
             # Add a version entry
             self.execute("""CREATE TABLE IF NOT EXISTS Version (
