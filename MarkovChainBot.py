@@ -165,8 +165,8 @@ class MarkovChain:
                     return
                 
                 # Send help message when requested.
-                elif m.message.startswith(("!ghelp", "!genhelp", "!generatehelp")):
-                    self.send_help_message()
+                #elif m.message.startswith(("!ghelp", "!genhelp", "!generatehelp")):
+                #    self.send_help_message()
 
                 # Ignore the message if it is deemed a command
                 elif self.check_if_other_command(m.message):
