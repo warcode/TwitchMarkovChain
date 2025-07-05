@@ -4,6 +4,33 @@ Twitch Bot for generating messages based on what it learned from chat
 
 ---
 
+## docker-compose ++
+
+Create settings.json and blacklist.txt
+
+Grab these and put the containing folders in /root/nltk_data/tokenizers/
+
+https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/tokenizers/punkt.zip
+
+https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/tokenizers/punkt_tab.zip
+
+```docker-compose
+services:
+  twitchmarkovchain:
+    image: "ghcr.io/warcode/twitchmarkovchain:master"
+    container_name: twitchmarkovchain
+    restart: unless-stopped
+    volumes:
+      - /mnt/user/db/tmc/settings.json:/app/settings.json
+      - /mnt/user/db/tmc/blacklist.txt:/app/blacklist.txt
+      - /mnt/user/db/tmc/db/:/app/db/
+      - /mnt/user/db/tmc/nltk_data/:/root/nltk_data/
+```
+
+
+
+---
+
 ## Explanation
 
 When the bot has started, it will start listening to chat messages in the channel listed in the `settings.json` file. Any chat message not sent by a denied user will be learned from. Whenever someone then requests a message to be generated, a [Markov Chain](https://en.wikipedia.org/wiki/Markov_chain) will be used with the learned data to generate a sentence. **Note that the bot is unaware of the meaning of any of its inputs and outputs. This means it can use bad language if it was taught to use bad language by people in chat. You can add a list of banned words it should never learn or say. Use at your own risk.**
