@@ -88,7 +88,7 @@ class Database:
     """
 
     def __init__(self, channel: str):
-        self.db_name = f"/db/MarkovChain_{channel.replace('#', '').lower()}.db"
+        self.db_name = f"/app/db/MarkovChain_{channel.replace('#', '').lower()}.db"
         self._execute_queue = []
 
         if os.path.isfile(self.db_name):
@@ -155,9 +155,9 @@ class Database:
             def progress(status, remaining, total):
                 logging.debug(f'Copied {total-remaining} of {total} pages...')
             conn = sqlite3.connect(
-                f"/db/MarkovChain_{channel.replace('#', '').lower()}.db")
+                f"/app/db/MarkovChain_{channel.replace('#', '').lower()}.db")
             back_conn = sqlite3.connect(
-                f"/db/MarkovChain_{channel.replace('#', '').lower()}_backup.db")
+                f"/app/db/MarkovChain_{channel.replace('#', '').lower()}_backup.db")
             with back_conn:
                 conn.backup(back_conn, pages=1000, progress=progress)
             conn.close()
@@ -301,13 +301,13 @@ class Database:
             from Tokenizer import tokenize
             from nltk import ngrams
             channel = channel.replace('#', '').lower()
-            copyfile(f"/db/MarkovChain_{channel}.db",
-                     f"/db/MarkovChain_{channel}_modified.db")
+            copyfile(f"/app/db/MarkovChain_{channel}.db",
+                     f"/app/db/MarkovChain_{channel}_modified.db")
             logger.info(
                 f"Created a copy of the database called \"MarkovChain_{channel}_modified.db\". The update will modify this file.")
 
             # Temporarily set self.db_name to the modified one
-            self.db_name = f"/db/MarkovChain_{channel.replace('#', '').lower()}_modified.db"
+            self.db_name = f"/app/db/MarkovChain_{channel.replace('#', '').lower()}_modified.db"
 
             # Create database tables.
             for first_char in list(string.ascii_uppercase) + ["_"]:
@@ -444,13 +444,13 @@ class Database:
 
             # Turn the non-modified, old version of the Database into a "_backup.db" file,
             # and turn the modified file into the new main file.
-            os.rename(f"/db/MarkovChain_{channel}.db",
-                      f"/db/MarkovChain_{channel}_backup.db")
-            os.rename(f"/db/MarkovChain_{channel}_modified.db",
-                      f"/db/MarkovChain_{channel}.db")
+            os.rename(f"/app/db/MarkovChain_{channel}.db",
+                      f"/app/db/MarkovChain_{channel}_backup.db")
+            os.rename(f"/app/db/MarkovChain_{channel}_modified.db",
+                      f"/app/db/MarkovChain_{channel}.db")
 
             # Revert to using .db instead of _modified.db
-            self.db_name = f"/db/MarkovChain_{channel.replace('#', '').lower()}.db"
+            self.db_name = f"/app/db/MarkovChain_{channel.replace('#', '').lower()}.db"
 
             # Add a version entry
             self.execute("""CREATE TABLE IF NOT EXISTS Version (
