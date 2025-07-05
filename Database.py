@@ -301,8 +301,8 @@ class Database:
             from Tokenizer import tokenize
             from nltk import ngrams
             channel = channel.replace('#', '').lower()
-            copyfile(f"MarkovChain_{channel}.db",
-                     f"MarkovChain_{channel}_modified.db")
+            copyfile(f"/db/MarkovChain_{channel}.db",
+                     f"/db/MarkovChain_{channel}_modified.db")
             logger.info(
                 f"Created a copy of the database called \"MarkovChain_{channel}_modified.db\". The update will modify this file.")
 
@@ -444,10 +444,10 @@ class Database:
 
             # Turn the non-modified, old version of the Database into a "_backup.db" file,
             # and turn the modified file into the new main file.
-            os.rename(f"MarkovChain_{channel}.db",
-                      f"MarkovChain_{channel}_backup.db")
-            os.rename(f"MarkovChain_{channel}_modified.db",
-                      f"MarkovChain_{channel}.db")
+            os.rename(f"/db/MarkovChain_{channel}.db",
+                      f"/db/MarkovChain_{channel}_backup.db")
+            os.rename(f"/db/MarkovChain_{channel}_modified.db",
+                      f"/db/MarkovChain_{channel}.db")
 
             # Revert to using .db instead of _modified.db
             self.db_name = f"/db/MarkovChain_{channel.replace('#', '').lower()}.db"
