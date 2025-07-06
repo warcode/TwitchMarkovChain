@@ -494,7 +494,7 @@ class MarkovChain:
 
     def log_learning_statistics(self) -> None:
         logger.info(f"Learned from {self.learning_counter} new messages")
-        learning_counter = 0
+        self.learning_counter = 0
 
     def send_whisper(self, user: str, message: str) -> None:
         """Optionally send a whisper, only if "WhisperCooldown" is True.
