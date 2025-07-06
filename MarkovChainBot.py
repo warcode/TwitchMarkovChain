@@ -24,6 +24,7 @@ class MarkovChain:
         # List of moderators used in blacklist modification, includes broadcaster
         self.mod_list = []
         self.set_blacklist()
+        self.learning_counter = 0
 
         # Fill previously initialised variables with data from the settings.txt file
         Settings(self)
@@ -41,6 +42,11 @@ class MarkovChain:
             if self.automatic_generation_timer < 30:
                 raise ValueError("Value for \"AutomaticGenerationMessage\" in must be at least 30 seconds, or a negative number for no automatic generations.")
             t = LoopingTimer(self.automatic_generation_timer, self.send_automatic_generation_message)
+            t.start()
+
+        # Set up daemon Timer to log learning statistics
+        if self.learning_counter == 0:
+            t = LoopingTimer(600, self.log_learning_statistics)
             t.start()
 
         self.ws = TwitchWebsocket(host=self.host, 
@@ -235,6 +241,7 @@ class MarkovChain:
                             key.append(word)
                         # Add <END> at the end of the sentence
                         self.db.add_rule_queue(key + ["<END>"])
+                        self.learning_counter = self.learning_counter + 1
                     
             elif m.type == "WHISPER":
                 # Allow people to whisper the bot to disable or enable whispers.
@@ -484,6 +491,10 @@ class MarkovChain:
                     logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
             else:
                 logger.info("Attempted to output automatic generation message, but there is not enough learned information yet.")
+
+    def log_learning_statistics(self) -> None:
+        logger.info(f"Learned from {self.learning_counter} new messages")
+        learning_counter = 0
 
     def send_whisper(self, user: str, message: str) -> None:
         """Optionally send a whisper, only if "WhisperCooldown" is True.
