@@ -89,8 +89,8 @@ class MarkovChain:
             if m.type == "366":
                 logger.info(f"Successfully joined channel: #{m.channel}")
                 # Get the list of mods used for modifying the blacklist
-                logger.info("Fetching mod list...")
-                self.ws.send_message("/mods")
+                #logger.info("Fetching mod list...")
+                #self.ws.send_message("/mods")
 
             elif m.type == "NOTICE":
                 # Check whether the NOTICE is a response to our /mods request
@@ -141,45 +141,13 @@ class MarkovChain:
                 # Ignore bot messages
                 if m.user.lower() in self.denied_users:
                     return
-                
-                if self.check_if_generate(m.message):
-                    if not self.enable_generate_command and not self.check_if_permissions(m):
-                        return
-
-                    if not self._enabled:
-                        if not self.db.check_whisper_ignore(m.user):
-                            self.send_whisper(m.user, "The !generate has been turned off. !nopm to stop me from whispering you.")
-                        return
-
-                    cur_time = time.time()
-                    if self.prev_message_t + self.cooldown < cur_time or self.check_if_permissions(m):
-                        if self.check_filter(m.message):
-                            sentence = "You can't make me say that, you madman!"
-                        else:
-                            params = tokenize(m.message)[2:] if self.allow_generate_params else None
-                            # Generate an actual sentence
-                            sentence, success = self.generate(params)
-                            if success:
-                                # Reset cooldown if a message was actually generated
-                                self.prev_message_t = time.time()
-                        logger.info(sentence)
-                        self.ws.send_message(sentence)
-                    else:
-                        if not self.db.check_whisper_ignore(m.user):
-                            self.send_whisper(m.user, f"Cooldown hit: {self.prev_message_t + self.cooldown - cur_time:0.2f} out of {self.cooldown:.0f}s remaining. !nopm to stop these cooldown pm's.")
-                        logger.info(f"Cooldown hit with {self.prev_message_t + self.cooldown - cur_time:0.2f}s remaining.")
-                    return
-                
-                # Send help message when requested.
-                #elif m.message.startswith(("!ghelp", "!genhelp", "!generatehelp")):
-                #    self.send_help_message()
 
                 # Ignore the message if it is deemed a command
-                elif self.check_if_other_command(m.message):
+                if self.check_if_other_command(m.message):
                     return
                 
                 # Ignore the message if it contains a link.
-                elif self.check_link(m.message):
+                if self.check_link(m.message):
                     return
 
                 if "emotes" in m.tags:
