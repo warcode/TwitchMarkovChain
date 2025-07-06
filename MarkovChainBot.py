@@ -25,7 +25,7 @@ class MarkovChain:
         self.mod_list = []
         self.set_blacklist()
         self.learning_counter = 0
-        self.awake = True
+        self.awake = False
 
         # Fill previously initialised variables with data from the settings.txt file
         Settings(self)
@@ -110,18 +110,18 @@ class MarkovChain:
                 if m.message.startswith("!wakeup") and self.check_if_permissions(m):
                     self.awake = True
                     logger.info("Waking up for auto-generating messages.")
-                    #try:
-                    #    self.ws.send_message("I wake rayrabHype")
-                    #except socket.OSError as error:
-                    #    logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
+                    try:
+                        self.ws.send_message("I wake rayrabHype")
+                    except socket.OSError as error:
+                        logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
                 
                 elif m.message.startswith("!sleep") and self.check_if_permissions(m):
                     self.awake = False
                     logger.info("Going to sleep for auto-generating messages.")
-                    #try:
-                    #    self.ws.send_message("I sleep rayrabSleepy")
-                    #except socket.OSError as error:
-                    #    logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
+                    try:
+                        self.ws.send_message("I sleep rayrabSleepy")
+                    except socket.OSError as error:
+                        logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
                 
                 elif m.message.startswith("!enable") and self.check_if_permissions(m):
                     if self._enabled:
@@ -468,11 +468,10 @@ class MarkovChain:
         if self.awake:
             sentence, success = self.generate()
             if success:
-                #logger.info(sentence)
+                logger.info(sentence)
                 # Try to send a message. Just log a warning on fail
                 try:
-                    logger.info(sentence)
-                    #self.ws.send_message(sentence)
+                    self.ws.send_message(sentence)
                 except socket.OSError as error:
                     logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
             else:
