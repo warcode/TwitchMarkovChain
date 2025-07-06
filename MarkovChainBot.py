@@ -461,8 +461,9 @@ class MarkovChain:
                 logger.info("Attempted to output automatic generation message, but there is not enough learned information yet.")
 
     def log_learning_statistics(self) -> None:
-        logger.info(f"Learned from {self.learning_counter} new messages")
-        self.learning_counter = 0
+        if self.learning_counter > 0:
+          logger.info(f"Learned from {self.learning_counter} new messages")
+          self.learning_counter = 0
 
     def send_whisper(self, user: str, message: str) -> None:
         """Optionally send a whisper, only if "WhisperCooldown" is True.
