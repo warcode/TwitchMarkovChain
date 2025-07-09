@@ -110,18 +110,18 @@ class MarkovChain:
                 if m.message.startswith("!wakeup") and self.check_if_permissions(m):
                     self.awake = True
                     logger.info("Waking up for auto-generating messages.")
-                    #try:
-                    #    self.ws.send_message("I wake.")
-                    #except socket.OSError as error:
-                    #    logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
+                    try:
+                        self.ws.send_message("NRWylder")
+                    except socket.OSError as error:
+                        logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
                 
                 elif m.message.startswith("!sleep") and self.check_if_permissions(m):
                     self.awake = False
                     logger.info("Going to sleep for auto-generating messages.")
-                    #try:
-                    #    self.ws.send_message("I sleep.")
-                    #except socket.OSError as error:
-                    #    logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
+                    try:
+                        self.ws.send_message("ThankEgg")
+                    except socket.OSError as error:
+                        logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
                 
                 elif m.message.startswith("!enable") and self.check_if_permissions(m):
                     if self._enabled:
