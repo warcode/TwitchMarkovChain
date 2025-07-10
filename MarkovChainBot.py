@@ -487,6 +487,7 @@ class MarkovChain:
     def log_learning_statistics(self) -> None:
         if self.learning_counter > 0:
           logger.info(f"Learned from {self.learning_counter} new messages")
+          logger.info(f"Chat activity counter at {self.generator_counter} out of {self.automatic_generation_timer}")
           self.learning_counter = 0
 
     def send_whisper(self, user: str, message: str) -> None:
