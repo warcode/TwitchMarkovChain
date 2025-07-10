@@ -25,7 +25,10 @@ class MarkovChain:
         self.mod_list = []
         self.set_blacklist()
         self.learning_counter = 0
+        self.generator_counter = 0
+        self.msg_value_in_seconds = 10
         self.awake = False
+        self.message_generator = None
 
         # Fill previously initialised variables with data from the settings.txt file
         Settings(self)
@@ -42,8 +45,8 @@ class MarkovChain:
         if self.automatic_generation_timer > 0:
             if self.automatic_generation_timer < 30:
                 raise ValueError("Value for \"AutomaticGenerationMessage\" in must be at least 30 seconds, or a negative number for no automatic generations.")
-            t = LoopingTimer(self.automatic_generation_timer, self.send_automatic_generation_message)
-            t.start()
+            self.message_generator = LoopingTimer(self.automatic_generation_timer, self.send_automatic_generation_message)
+            self.message_generator.start()
 
         # Set up daemon Timer to log learning statistics
         if self.learning_counter == 0:
@@ -227,6 +230,9 @@ class MarkovChain:
                         # Add <END> at the end of the sentence
                         self.db.add_rule_queue(key + ["<END>"])
                         self.learning_counter = self.learning_counter + 1
+                        self.generator_counter = self.generator_counter + self.msg_value_in_seconds
+                        if self.generator_counter > self.automatic_generation_timer:
+                            self.message_generator.stopped.set()
                     
             elif m.type == "WHISPER":
                 # Allow people to whisper the bot to disable or enable whispers.
@@ -465,6 +471,7 @@ class MarkovChain:
         
         As long as the bot wasn't disabled, just like if someone typed "!g" in chat.
         """
+        self.generator_counter = 0
         if self.awake:
             sentence, success = self.generate()
             if success:
