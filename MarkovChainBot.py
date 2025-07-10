@@ -26,9 +26,9 @@ class MarkovChain:
         self.set_blacklist()
         self.learning_counter = 0
         self.generator_counter = 0
-        #self.message_value_in_seconds = 20
         self.awake = False
         self.message_generator = None
+        self.message_generated_from_activity = False
 
         # Fill previously initialised variables with data from the settings.txt file
         Settings(self)
@@ -233,7 +233,7 @@ class MarkovChain:
                         self.learning_counter = self.learning_counter + 1
                         self.generator_counter = self.generator_counter + self.message_value_in_seconds
                         if self.generator_counter > self.automatic_generation_timer:
-                            self.message_generator.stopped.set()
+                            send_activity_generation_message()
                     
             elif m.type == "WHISPER":
                 # Allow people to whisper the bot to disable or enable whispers.
@@ -472,8 +472,27 @@ class MarkovChain:
         
         As long as the bot wasn't disabled, just like if someone typed "!g" in chat.
         """
+        
+        if self.awake and not self.message_generated_from_activity:
+            sentence, success = self.generate()
+            if success:
+                logger.info(sentence)
+                # Try to send a message. Just log a warning on fail
+                try:
+                    self.ws.send_message(sentence)
+                except socket.OSError as error:
+                    logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
+            else:
+                logger.info("Attempted to output automatic generation message, but there is not enough learned information yet.")
+        self.message_generated_from_activity = False
+
+    
+    def send_activity_generation_message(self) -> None:
+        """Based on chat activity, send a generation message to the connected chat.
+        """
         self.generator_counter = 0
         if self.awake:
+            self.message_generated_from_activity = True
             sentence, success = self.generate()
             if success:
                 logger.info(sentence)
