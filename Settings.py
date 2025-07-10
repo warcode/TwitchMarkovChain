@@ -24,6 +24,7 @@ class SettingsData(TypedDict):
     WhisperCooldown: bool
     EnableGenerateCommand: bool
     SentenceSeparator: str
+    MessageValueInSeconds : int
 
 class Settings:
     """ Loads data from settings.json into the bot """
@@ -48,7 +49,8 @@ class Settings:
         "EnableGenerateCommand": True,
         "SentenceSeparator": " - ",
         "AllowGenerateParams": True,
-        "GenerateCommands": ["!generate", "!g"]
+        "GenerateCommands": ["!generate", "!g"],
+        "MessageValueInSeconds": 0
     }
 
     def __init__(self, bot) -> None:
