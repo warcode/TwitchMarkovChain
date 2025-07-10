@@ -26,7 +26,7 @@ class MarkovChain:
         self.set_blacklist()
         self.learning_counter = 0
         self.generator_counter = 0
-        self.msg_value_in_seconds = 10
+        self.msg_value_in_seconds = 20
         self.awake = False
         self.message_generator = None
 
