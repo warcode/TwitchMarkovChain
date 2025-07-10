@@ -232,8 +232,8 @@ class MarkovChain:
                         self.db.add_rule_queue(key + ["<END>"])
                         self.learning_counter = self.learning_counter + 1
                         self.generator_counter = self.generator_counter + self.message_value_in_seconds
-                        if self.generator_counter > self.automatic_generation_timer:
-                            send_activity_generation_message()
+                        if self.generator_counter >= self.automatic_generation_timer:
+                            self.send_activity_generation_message()
                     
             elif m.type == "WHISPER":
                 # Allow people to whisper the bot to disable or enable whispers.
