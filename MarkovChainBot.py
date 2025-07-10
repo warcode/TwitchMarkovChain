@@ -26,7 +26,7 @@ class MarkovChain:
         self.set_blacklist()
         self.learning_counter = 0
         self.generator_counter = 0
-        self.msg_value_in_seconds = 20
+        #self.message_value_in_seconds = 20
         self.awake = False
         self.message_generator = None
 
@@ -87,6 +87,7 @@ class MarkovChain:
         self.sent_separator = settings["SentenceSeparator"]
         self.allow_generate_params = settings["AllowGenerateParams"]
         self.generate_commands = tuple(settings["GenerateCommands"])
+        self.message_value_in_seconds = settings["MessageValueInSeconds"]
 
     def message_handler(self, m: Message):
         try:
@@ -230,7 +231,7 @@ class MarkovChain:
                         # Add <END> at the end of the sentence
                         self.db.add_rule_queue(key + ["<END>"])
                         self.learning_counter = self.learning_counter + 1
-                        self.generator_counter = self.generator_counter + self.msg_value_in_seconds
+                        self.generator_counter = self.generator_counter + self.message_value_in_seconds
                         if self.generator_counter > self.automatic_generation_timer:
                             self.message_generator.stopped.set()
                     
