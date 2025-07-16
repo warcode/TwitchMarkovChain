@@ -120,7 +120,7 @@ class MarkovChain:
                     try:
                         self.ws.send_message("NRWylder")
                     except socket.OSError as error:
-                        logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
+                        logger.warning(f"[OSError: {error}] upon sending message. Ignoring.")
                 
                 elif m.message.startswith("!sleep") and self.check_if_permissions(m):
                     self.awake = False
@@ -128,37 +128,7 @@ class MarkovChain:
                     try:
                         self.ws.send_message("ThankEgg")
                     except socket.OSError as error:
-                        logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
-                
-                elif m.message.startswith("!enable") and self.check_if_permissions(m):
-                    if self._enabled:
-                        self.ws.send_whisper(m.user, "The generate command is already enabled.")
-                    else:
-                        self.ws.send_whisper(m.user, "Users can now use generate command again.")
-                        self._enabled = True
-                        logger.info("Users can now use generate command again.")
-
-                elif m.message.startswith("!disable") and self.check_if_permissions(m):
-                    if self._enabled:
-                        self.ws.send_whisper(m.user, "Users can now no longer use generate command.")
-                        self._enabled = False
-                        logger.info("Users can now no longer use generate command.")
-                    else:
-                        self.ws.send_whisper(m.user, "The generate command is already disabled.")
-
-                elif m.message.startswith(("!setcooldown", "!setcd")) and self.check_if_permissions(m):
-                    split_message = m.message.split(" ")
-                    if len(split_message) == 2:
-                        try:
-                            cooldown = int(split_message[1])
-                        except ValueError:
-                            self.ws.send_whisper(m.user, f"The parameter must be an integer amount, eg: !setcd 30")
-                            return
-                        self.cooldown = cooldown
-                        Settings.update_cooldown(cooldown)
-                        self.ws.send_whisper(m.user, f"The !generate cooldown has been set to {cooldown} seconds.")
-                    else:
-                        self.ws.send_whisper(m.user, f"Please add exactly 1 integer parameter, eg: !setcd 30.")
+                        logger.warning(f"[OSError: {error}] upon sending message. Ignoring.")
 
             if m.type == "PRIVMSG":
 
@@ -263,59 +233,6 @@ class MarkovChain:
                         self.generator_counter = self.generator_counter + self.message_value_in_seconds
                         if self.generator_counter >= self.automatic_generation_timer:
                             self.send_activity_generation_message()
-                    
-            elif m.type == "WHISPER":
-                # Allow people to whisper the bot to disable or enable whispers.
-                if m.message == "!nopm":
-                    logger.debug(f"Adding {m.user} to Do Not Whisper.")
-                    self.db.add_whisper_ignore(m.user)
-                    self.ws.send_whisper(m.user, "You will no longer be sent whispers. Type !yespm to reenable. ")
-
-                elif m.message == "!yespm":
-                    logger.debug(f"Removing {m.user} from Do Not Whisper.")
-                    self.db.remove_whisper_ignore(m.user)
-                    self.ws.send_whisper(m.user, "You will again be sent whispers. Type !nopm to disable again. ")
-
-                # Note that I add my own username to this list to allow me to manage the 
-                # blacklist in channels of my bot in channels I am not modded in.
-                # I may modify this and add a "allowed users" field in the settings file.
-                elif m.user.lower() in self.mod_list + ["cubiedev"] + self.allowed_users:
-                    # Adding to the blacklist
-                    if self.check_if_our_command(m.message, "!blacklist"):
-                        if len(m.message.split()) == 2:
-                            # TODO: Remove newly blacklisted word from the Database
-                            word = m.message.split()[1].lower()
-                            self.blacklist.append(word)
-                            logger.info(f"Added `{word}` to Blacklist.")
-                            self.write_blacklist(self.blacklist)
-                            self.ws.send_whisper(m.user, "Added word to Blacklist.")
-                        else:
-                            self.ws.send_whisper(m.user, "Expected Format: `!blacklist word` to add `word` to the blacklist")
-
-                    # Removing from the blacklist
-                    elif self.check_if_our_command(m.message, "!whitelist"):
-                        if len(m.message.split()) == 2:
-                            word = m.message.split()[1].lower()
-                            try:
-                                self.blacklist.remove(word)
-                                logger.info(f"Removed `{word}` from Blacklist.")
-                                self.write_blacklist(self.blacklist)
-                                self.ws.send_whisper(m.user, "Removed word from Blacklist.")
-                            except ValueError:
-                                self.ws.send_whisper(m.user, "Word was already not in the blacklist.")
-                        else:
-                            self.ws.send_whisper(m.user, "Expected Format: `!whitelist word` to remove `word` from the blacklist.")
-                    
-                    # Checking whether a word is in the blacklist
-                    elif self.check_if_our_command(m.message, "!check"):
-                        if len(m.message.split()) == 2:
-                            word = m.message.split()[1].lower()
-                            if word in self.blacklist:
-                                self.ws.send_whisper(m.user, "This word is in the Blacklist.")
-                            else:
-                                self.ws.send_whisper(m.user, "This word is not in the Blacklist.")
-                        else:
-                            self.ws.send_whisper(m.user, "Expected Format: `!check word` to check whether `word` is on the blacklist.")
 
             elif m.type == "CLEARMSG":
                 # If a message is deleted, its contents will be unlearned
