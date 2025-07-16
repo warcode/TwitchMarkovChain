@@ -90,6 +90,7 @@ class MarkovChain:
         self.allow_generate_params = settings["AllowGenerateParams"]
         self.generate_commands = tuple(settings["GenerateCommands"])
         self.message_value_in_seconds = settings["MessageValueInSeconds"]
+        self.emote_prefix = settings["EmotePrefix"]
 
     def message_handler(self, m: Message):
         try:
@@ -187,6 +188,7 @@ class MarkovChain:
                     return
 
                 if "emotes" in m.tags:
+                    logger.info("Message contains emotes: " + m.tags["emotes"])
                     # If the list of emotes contains "emotesv2_", then the message contains a bit emote, 
                     # and we choose not to learn from those messages.
                     if "emotesv2_" in m.tags["emotes"]:
@@ -197,6 +199,9 @@ class MarkovChain:
                     # as the bot will never have the modified emotes unlocked at the time.
                     for modifier in self.extract_modifiers(m.tags["emotes"]):
                         m.message = m.message.replace(modifier, "")
+
+                    #for e in m.tags["emotes"]:
+                    #    self.emote_prefix
                     
                 # Ignore the message if any word in the sentence is on the ban filter
                 if self.check_filter(m.message):
