@@ -190,6 +190,7 @@ class MarkovChain:
                     # If the list of emotes contains "emotesv2_", then the message contains a bit emote, 
                     # and we choose not to learn from those messages.
                     if "emotesv2_" in m.tags["emotes"]:
+                        logger.info("Ignoring bit emote message.")
                         return
 
                     # Replace modified emotes with normal versions, 
