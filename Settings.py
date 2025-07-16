@@ -25,6 +25,7 @@ class SettingsData(TypedDict):
     EnableGenerateCommand: bool
     SentenceSeparator: str
     MessageValueInSeconds : int
+    EmotePrefix : str
 
 class Settings:
     """ Loads data from settings.json into the bot """
@@ -50,7 +51,8 @@ class Settings:
         "SentenceSeparator": " - ",
         "AllowGenerateParams": True,
         "GenerateCommands": ["!generate", "!g"],
-        "MessageValueInSeconds": 0
+        "MessageValueInSeconds": 0,
+        "EmotePrefix": "NA"
     }
 
     def __init__(self, bot) -> None:
