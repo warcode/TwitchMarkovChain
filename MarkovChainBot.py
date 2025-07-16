@@ -28,6 +28,7 @@ class MarkovChain:
         self.generator_counter = 0
         self.awake = False
         self.learning = False
+        self.learning_individuals = []
         self.message_generator = None
         self.message_generated_from_activity = False
 
@@ -176,12 +177,12 @@ class MarkovChain:
                 if not self.learning:
                     logger.info("Ignoring message. Learning is paused.")
                     user_hash = str(hash(m.user.lower()))
-                    if self.learing_individuals.count(user_hash) < 1:
-                        self.learing_individuals.append(user_hash)
+                    if self.learning_individuals.count(user_hash) < 1:
+                        self.learning_individuals.append(user_hash)
                     
-                    if len(self.learing_individuals) >= 3:
+                    if len(self.learning_individuals) >= 3:
                         self.learning = True
-                        self.learing_individuals.clear()
+                        self.learning_individuals.clear()
                         logger.info("Starting learning.")
                     return
 
@@ -525,7 +526,7 @@ class MarkovChain:
           self.learning_counter = 0
         else:
             self.learning = False
-            self.learing_individuals.clear()
+            self.learning_individuals.clear()
 
     def send_whisper(self, user: str, message: str) -> None:
         """Optionally send a whisper, only if "WhisperCooldown" is True.
