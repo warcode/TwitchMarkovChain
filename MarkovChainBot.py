@@ -188,20 +188,28 @@ class MarkovChain:
                     return
 
                 if "emotes" in m.tags:
-                    logger.info("Message contains emotes: " + m.tags["emotes"])
-                    # If the list of emotes contains "emotesv2_", then the message contains a bit emote, 
-                    # and we choose not to learn from those messages.
-                    if "emotesv2_" in m.tags["emotes"]:
-                        logger.info("Ignoring bit emote message.")
-                        return
-
+                    
                     # Replace modified emotes with normal versions, 
                     # as the bot will never have the modified emotes unlocked at the time.
                     for modifier in self.extract_modifiers(m.tags["emotes"]):
                         m.message = m.message.replace(modifier, "")
 
-                    #for e in m.tags["emotes"]:
-                    #    self.emote_prefix
+                    # Find emotes and remove any that do not contain the supplied emote prefix
+                    emotes = m.tags["emotes"].split("/")
+                    names = []
+                    if not emotes[0] == "":
+                        for e in emotes:
+                            keys = e.split(":")[1].split("-")
+                            name = m.message[int(keys[0]):int(keys[1])+1]
+                            names.append(name)
+
+                        for n in names:
+                            if self.emote_prefix == "NA":
+                                m.message = m.message.replace(n, "")
+                            else:
+                                if not n.startswith(self.emote_prefix):
+                                    m.message = m.message.replace(n, "")
+                                    logger.info("Stripped emote: " + n)
                     
                 # Ignore the message if any word in the sentence is on the ban filter
                 if self.check_filter(m.message):
