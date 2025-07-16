@@ -27,6 +27,7 @@ class MarkovChain:
         self.learning_counter = 0
         self.generator_counter = 0
         self.awake = False
+        self.learning = False
         self.message_generator = None
         self.message_generated_from_activity = False
 
@@ -171,6 +172,19 @@ class MarkovChain:
                 if self.check_link(m.message):
                     return
 
+                # Ignore if learning is paused
+                if not self.learning:
+                    logger.info("Ignoring message. Learning is paused.")
+                    user_hash = str(hash(m.user.lower()))
+                    if self.learing_individuals.count(user_hash) < 1:
+                        self.learing_individuals.append(user_hash)
+                    
+                    if len(self.learing_individuals) >= 3:
+                        self.learning = True
+                        self.learing_individuals.clear()
+                        logger.info("Starting learning.")
+                    return
+
                 if "emotes" in m.tags:
                     # If the list of emotes contains "emotesv2_", then the message contains a bit emote, 
                     # and we choose not to learn from those messages.
@@ -181,7 +195,7 @@ class MarkovChain:
                     # as the bot will never have the modified emotes unlocked at the time.
                     for modifier in self.extract_modifiers(m.tags["emotes"]):
                         m.message = m.message.replace(modifier, "")
-
+                    
                 # Ignore the message if any word in the sentence is on the ban filter
                 if self.check_filter(m.message):
                     logger.warning(f"Sentence contained blacklisted word or phrase:\"{m.message}\"")
@@ -509,6 +523,9 @@ class MarkovChain:
           logger.info(f"Learned from {self.learning_counter} new messages")
           logger.info(f"Chat activity counter at {self.generator_counter} out of {self.automatic_generation_timer}")
           self.learning_counter = 0
+        else:
+            self.learning = False
+            self.learing_individuals.clear()
 
     def send_whisper(self, user: str, message: str) -> None:
         """Optionally send a whisper, only if "WhisperCooldown" is True.
