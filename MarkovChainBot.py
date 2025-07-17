@@ -158,7 +158,7 @@ class MarkovChain:
                     mods = ["_BW","_HF","_SG","_SQ","_TK"]
                     if not emotes[0] == "":
                         for e in emotes:
-                            keys = e.split(":")[1].split("-")
+                            keys = e.split(":")[1].split(",")[0].split("-")
                             name = m.message[int(keys[0]):int(keys[1])+1]
                             names.append(name)
 
