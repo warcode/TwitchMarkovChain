@@ -35,13 +35,6 @@ class MarkovChain:
         # Fill previously initialised variables with data from the settings.txt file
         Settings(self)
         self.db = Database(self.chan)
-
-        # Set up daemon Timer to send help messages
-        if self.help_message_timer > 0:
-            if self.help_message_timer < 300:
-                raise ValueError("Value for \"HelpMessageTimer\" in must be at least 300 seconds, or a negative number for no help messages.")
-            t = LoopingTimer(self.help_message_timer, self.send_help_message)
-            t.start()
         
         # Set up daemon Timer to send automatic generation messages
         if self.automatic_generation_timer > 0:
@@ -82,7 +75,6 @@ class MarkovChain:
         self.key_length = settings["KeyLength"]
         self.max_sentence_length = settings["MaxSentenceWordAmount"]
         self.min_sentence_length = settings["MinSentenceWordAmount"]
-        self.help_message_timer = settings["HelpMessageTimer"]
         self.automatic_generation_timer = settings["AutomaticGenerationTimer"]
         self.whisper_cooldown = settings["WhisperCooldown"]
         self.enable_generate_command = settings["EnableGenerateCommand"]
@@ -403,15 +395,6 @@ class MarkovChain:
             logger.warning("Loading Blacklist Failed!")
             self.blacklist = ["<start>", "<end>"]
             self.write_blacklist(self.blacklist)
-
-    def send_help_message(self) -> None:
-        """Send a Help message to the connected chat, as long as the bot wasn't disabled."""
-        if self._enabled:
-            logger.info("Help message sent.")
-            try:
-                self.ws.send_message("Learn how this bot generates sentences here: https://github.com/CubieDev/TwitchMarkovChain#how-it-works")
-            except socket.OSError as error:
-                logger.warning(f"[OSError: {error}] upon sending help message. Ignoring.")
 
     def send_automatic_generation_message(self) -> None:
         """Send an automatic generation message to the connected chat.
