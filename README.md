@@ -4,6 +4,14 @@ Twitch Bot for generating messages based on what it learned from chat
 
 ---
 
+At this point the code has been heavily modified.
+
+The goal is to have a bot that learns from chat and sends messages with minimal interaction required.
+
+The only functioning commands are `!wakeup` and `!sleep` to start/stop sending messages.
+
+---
+
 ## docker-compose ++
 
 Create settings.json and blacklist.txt
