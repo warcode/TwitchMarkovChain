@@ -349,26 +349,6 @@ class MarkovChain:
                     count += 1
         return count
 
-    def extract_modifiers(self, emotes: str) -> List[str]:
-        """Extract emote modifiers from emotes, such as the the horizontal flip.
-
-        Args:
-            emotes (str): String containing all emotes used in the message.
-        
-        Returns:
-            List[str]: List of strings that show modifiers, such as "_HZ" for horizontal flip.
-        """
-        output = []
-        try:
-            while emotes:
-                u_index = emotes.index("_")
-                c_index = emotes.index(":", u_index)
-                output.append(emotes[u_index:c_index])
-                emotes = emotes[c_index:]
-        except ValueError:
-            pass
-        return output
-
     def write_blacklist(self, blacklist: List[str]) -> None:
         """Write blacklist.txt given a list of banned words.
 
