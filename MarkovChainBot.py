@@ -150,15 +150,12 @@ class MarkovChain:
                     return
 
                 if "emotes" in m.tags:
-                    
-                    # Replace modified emotes with normal versions, 
-                    # as the bot will never have the modified emotes unlocked at the time.
-                    for modifier in self.extract_modifiers(m.tags["emotes"]):
-                        m.message = m.message.replace(modifier, "")
 
                     # Find emotes and remove any that do not contain the supplied emote prefix
+                    # Also remove any emote that has been modified
                     emotes = m.tags["emotes"].split("/")
                     names = []
+                    mods = ["_BW","_HF","_SG","_SQ","_TK"]
                     if not emotes[0] == "":
                         for e in emotes:
                             keys = e.split(":")[1].split("-")
@@ -169,7 +166,7 @@ class MarkovChain:
                             if self.emote_prefix == "NA":
                                 m.message = m.message.replace(n, "")
                             else:
-                                if not n.startswith(self.emote_prefix):
+                                if not n.startswith(self.emote_prefix) or name[-3:] in mods:
                                     m.message = m.message.replace(n, "")
                                     logger.info("Stripped emote: " + n)
                     
