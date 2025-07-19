@@ -395,7 +395,7 @@ class MarkovChain:
                 self.learning_average = self.learning_counter
             else:
                 self.learning_average = round((self.learning_average + self.learning_counter) / 2)
-          self.learning_counter = 0
+            self.learning_counter = 0
         else:
             self.learning = False
             self.learning_individuals.clear()
