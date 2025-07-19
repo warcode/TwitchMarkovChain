@@ -375,7 +375,7 @@ class MarkovChain:
                 peak_boost = round((self.learning_average_peak - self.learning_average)*0.8)
 
             # Boost up 80% towards one message per 30 minutes
-            if self.learning_average < round((self.automatic_generation_message_count/30)*10)
+            if self.learning_average < round((self.automatic_generation_message_count/30)*10):
                 time_boost = round((((self.automatic_generation_message_count/30)*10) - self.learning_average)*0.8)
             
             self.generator_counter = round(self.generator_counter + round((peak_boost+time_boost)/2))
