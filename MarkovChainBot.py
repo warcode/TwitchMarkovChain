@@ -29,19 +29,16 @@ class MarkovChain:
         self.awake = False
         self.learning = False
         self.learning_individuals = []
-        self.message_generator = None
-        self.message_generated_from_activity = False
+        self.learning_average = 0
+        self.maintenance_timer = None
 
         # Fill previously initialised variables with data from the settings.txt file
         Settings(self)
         self.db = Database(self.chan)
         
-        # Set up daemon Timer to send automatic generation messages
-        if self.automatic_generation_timer > 0:
-            if self.automatic_generation_timer < 30:
-                raise ValueError("Value for \"AutomaticGenerationMessage\" in must be at least 30 seconds, or a negative number for no automatic generations.")
-            self.message_generator = LoopingTimer(self.automatic_generation_timer, self.send_automatic_generation_message)
-            self.message_generator.start()
+        # Set up daemon Timer to perform maintenance tasks
+        self.maintenance_timer = LoopingTimer(600, self.perform_maintenance_tasks)
+        self.maintenance_timer.start()
 
         # Set up daemon Timer to log learning statistics
         if self.learning_counter == 0:
@@ -81,7 +78,7 @@ class MarkovChain:
         self.sent_separator = settings["SentenceSeparator"]
         self.allow_generate_params = settings["AllowGenerateParams"]
         self.generate_commands = tuple(settings["GenerateCommands"])
-        self.message_value_in_seconds = settings["MessageValueInSeconds"]
+        self.automatic_generation_message_count = settings["AutomaticGenerationMessageCount"]
         self.emote_prefix = settings["EmotePrefix"]
 
     def message_handler(self, m: Message):
@@ -219,8 +216,8 @@ class MarkovChain:
                         # Add <END> at the end of the sentence
                         self.db.add_rule_queue(key + ["<END>"])
                         self.learning_counter = self.learning_counter + 1
-                        self.generator_counter = self.generator_counter + self.message_value_in_seconds
-                        if self.generator_counter >= self.automatic_generation_timer:
+                        self.generator_counter = self.generator_counter + 1
+                        if self.generator_counter >= self.automatic_generation_message_count:
                             self.send_activity_generation_message()
 
             elif m.type == "CLEARMSG":
@@ -373,32 +370,18 @@ class MarkovChain:
             self.blacklist = ["<start>", "<end>"]
             self.write_blacklist(self.blacklist)
 
-    def send_automatic_generation_message(self) -> None:
-        """Send an automatic generation message to the connected chat.
-        
-        As long as the bot wasn't disabled, just like if someone typed "!g" in chat.
-        """
-        
-        if self.awake and not self.message_generated_from_activity:
-            sentence, success = self.generate()
-            if success:
-                logger.info(sentence)
-                # Try to send a message. Just log a warning on fail
-                try:
-                    self.ws.send_message(sentence)
-                except socket.OSError as error:
-                    logger.warning(f"[OSError: {error}] upon sending automatic generation message. Ignoring.")
-            else:
-                logger.info("Attempted to output automatic generation message, but there is not enough learned information yet.")
-        self.message_generated_from_activity = False
+    def perform_maintenance_tasks(self) -> None:
+        # Perform maintenance tasks
+        if self.learning_average > 0:
+            self.generator_counter = self.generator_counter + round(self.learning_average/4)
+        logger.info(f"Chat activity counter at {self.generator_counter} out of {self.automatic_generation_message_count}")
+            
 
-    
     def send_activity_generation_message(self) -> None:
         """Based on chat activity, send a generation message to the connected chat.
         """
         self.generator_counter = 0
         if self.awake:
-            self.message_generated_from_activity = True
             sentence, success = self.generate()
             if success:
                 logger.info(sentence)
@@ -412,8 +395,11 @@ class MarkovChain:
 
     def log_learning_statistics(self) -> None:
         if self.learning_counter > 0:
-          logger.info(f"Learned from {self.learning_counter} new messages")
-          logger.info(f"Chat activity counter at {self.generator_counter} out of {self.automatic_generation_timer}")
+            logger.info(f"Learned from {self.learning_counter} new messages")
+            if self.learning_average == 0:
+                self.learning_average = self.learning_counter
+            else:
+                self.learning_average = round((self.learning_average + self.learning_counter) / 2)
           self.learning_counter = 0
         else:
             self.learning = False
