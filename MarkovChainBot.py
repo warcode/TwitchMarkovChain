@@ -368,8 +368,9 @@ class MarkovChain:
         # Perform maintenance tasks
         if self.learning_average > 0:
             self.generator_counter = self.generator_counter + round(self.learning_average/4)
+            logger.info(f"Added {round(self.learning_average/4)} to Chat activity counter.")
         logger.info(f"Chat activity counter at {self.generator_counter} out of {self.automatic_generation_message_count}")
-            
+
 
     def send_activity_generation_message(self) -> None:
         """Based on chat activity, send a generation message to the connected chat.
