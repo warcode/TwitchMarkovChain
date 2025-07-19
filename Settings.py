@@ -15,16 +15,12 @@ class SettingsData(TypedDict):
     Authentication: str
     DeniedUsers: List[str]
     AllowedUsers: List[str]
-    Cooldown: int
     KeyLength: int
     MaxSentenceWordAmount: int
     MinSentenceWordAmount: int
-    AutomaticGenerationTimer: int
-    WhisperCooldown: bool
-    EnableGenerateCommand: bool
     SentenceSeparator: str
-    MessageValueInSeconds : int
     EmotePrefix : str
+    AutomaticGenerationMessageCount : int
 
 class Settings:
     """ Loads data from settings.json into the bot """
@@ -39,18 +35,12 @@ class Settings:
         "Authentication": "oauth:<auth>",
         "DeniedUsers": ["StreamElements", "Nightbot", "Moobot", "Marbiebot"],
         "AllowedUsers": [],
-        "Cooldown": 20,
         "KeyLength": 2,
         "MaxSentenceWordAmount": 25,
         "MinSentenceWordAmount": -1,
-        "AutomaticGenerationTimer": -1,
-        "WhisperCooldown": True,
-        "EnableGenerateCommand": True,
-        "SentenceSeparator": " - ",
-        "AllowGenerateParams": True,
-        "GenerateCommands": ["!generate", "!g"],
-        "MessageValueInSeconds": 0,
-        "EmotePrefix": "NA"
+        "SentenceSeparator": ". ",
+        "EmotePrefix": "NA",
+        "AutomaticGenerationMessageCount": 150
     }
 
     def __init__(self, bot) -> None:
