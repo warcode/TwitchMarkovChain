@@ -30,6 +30,7 @@ class MarkovChain:
         self.learning = False
         self.learning_individuals = []
         self.learning_average = 0
+        self.learning_average_peak = 0
         self.maintenance_timer = None
 
         # Fill previously initialised variables with data from the settings.txt file
@@ -367,8 +368,10 @@ class MarkovChain:
     def perform_maintenance_tasks(self) -> None:
         # Perform maintenance tasks
         if self.learning_average > 0:
-            self.generator_counter = self.generator_counter + round(self.learning_average/4)
-            logger.info(f"Added {round(self.learning_average/4)} to Chat activity counter.")
+            if self.learning_average < self.learning_average_peak:
+                boost = round((self.learning_average_peak - self.learning_average)*0.8)
+                self.generator_counter = round(self.generator_counter + boost)
+                logger.info(f"Added {boost} to Chat activity counter.")
         logger.info(f"Chat activity counter at {self.generator_counter} out of {self.automatic_generation_message_count}")
 
 
@@ -393,11 +396,16 @@ class MarkovChain:
             logger.info(f"Learned from {self.learning_counter} new messages")
             if self.learning_average == 0:
                 self.learning_average = self.learning_counter
+                self.learning_average_peak = self.learning_counter
             else:
                 self.learning_average = round((self.learning_average + self.learning_counter) / 2)
+                if self.learning_average > self.learning_average_peak:
+                    self.learning_average_peak = round((self.learning_average_peak+self.learning_average)/2)
             self.learning_counter = 0
         else:
             self.learning = False
+            self.learning_average_peak = 0
+            self.learing_average = 0
             self.learning_individuals.clear()
 
     def check_filter(self, message: str) -> bool:
