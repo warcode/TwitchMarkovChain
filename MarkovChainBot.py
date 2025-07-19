@@ -68,18 +68,12 @@ class MarkovChain:
         self.auth = settings["Authentication"]
         self.denied_users = [user.lower() for user in settings["DeniedUsers"]] + [self.nick.lower()]
         self.allowed_users = [user.lower() for user in settings["AllowedUsers"]]
-        self.cooldown = settings["Cooldown"]
         self.key_length = settings["KeyLength"]
         self.max_sentence_length = settings["MaxSentenceWordAmount"]
         self.min_sentence_length = settings["MinSentenceWordAmount"]
-        self.automatic_generation_timer = settings["AutomaticGenerationTimer"]
-        self.whisper_cooldown = settings["WhisperCooldown"]
-        self.enable_generate_command = settings["EnableGenerateCommand"]
         self.sent_separator = settings["SentenceSeparator"]
-        self.allow_generate_params = settings["AllowGenerateParams"]
-        self.generate_commands = tuple(settings["GenerateCommands"])
-        self.automatic_generation_message_count = settings["AutomaticGenerationMessageCount"]
         self.emote_prefix = settings["EmotePrefix"]
+        self.automatic_generation_message_count = settings["AutomaticGenerationMessageCount"]
 
     def message_handler(self, m: Message):
         try:
@@ -404,16 +398,6 @@ class MarkovChain:
         else:
             self.learning = False
             self.learning_individuals.clear()
-
-    def send_whisper(self, user: str, message: str) -> None:
-        """Optionally send a whisper, only if "WhisperCooldown" is True.
-        
-        Args:
-            user (str): The user to potentially whisper.
-            message (str): The message to potentially whisper
-        """
-        if self.whisper_cooldown:
-            self.ws.send_whisper(user, message)
 
     def check_filter(self, message: str) -> bool:
         """Returns True if message contains a banned word.
