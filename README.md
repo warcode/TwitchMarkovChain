@@ -10,6 +10,8 @@ The goal is to have a bot that learns from chat and sends messages with minimal 
 
 The only functioning commands are `!wakeup` and `!sleep` to start/stop sending messages.
 
+Set the allowed `EmotePrefix` and `AutomaticGenerationMessageCount` to number of chat messages between posts in the settings.
+
 ---
 
 ## docker-compose ++
