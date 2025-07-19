@@ -368,10 +368,18 @@ class MarkovChain:
     def perform_maintenance_tasks(self) -> None:
         # Perform maintenance tasks
         if self.learning_average > 0:
+            peak_boost = 0
+            time_boost = 0
+            # Boost up 80% towards peak message rate
             if self.learning_average < self.learning_average_peak:
-                boost = round((self.learning_average_peak - self.learning_average)*0.8)
-                self.generator_counter = round(self.generator_counter + boost)
-                logger.info(f"Added {boost} to Chat activity counter.")
+                peak_boost = round((self.learning_average_peak - self.learning_average)*0.8)
+
+            # Boost up 80% towards one message per 30 minutes
+            if self.learning_average < round((self.automatic_generation_message_count/30)*10)
+                time_boost = round((((self.automatic_generation_message_count/30)*10) - self.learning_average)*0.8)
+            
+            self.generator_counter = round(self.generator_counter + round((peak_boost+time_boost)/2))
+            logger.info(f"Added {time_boost} time boost and {peak_boost} peak boost for an avg of {round((peak_boost+time_boost)/2)} to Chat activity counter.")
         logger.info(f"Chat activity counter at {self.generator_counter} out of {self.automatic_generation_message_count}")
 
 
