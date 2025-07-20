@@ -41,11 +41,6 @@ class MarkovChain:
         self.maintenance_timer = LoopingTimer(600, self.perform_maintenance_tasks)
         self.maintenance_timer.start()
 
-        # Set up daemon Timer to log learning statistics
-        if self.learning_counter == 0:
-            t = LoopingTimer(600, self.log_learning_statistics)
-            t.start()
-
         self.ws = TwitchWebsocket(host=self.host, 
                                   port=self.port,
                                   chan=self.chan,
@@ -366,6 +361,24 @@ class MarkovChain:
             self.write_blacklist(self.blacklist)
 
     def perform_maintenance_tasks(self) -> None:
+        # Handle automatically enabling/disabling learning, as well as statistics
+        # If there are no messages in the last 10 minutes we disable learning
+        if self.learning_counter > 0:
+            logger.info(f"Learned from {self.learning_counter} new messages")
+            if self.learning_average == 0:
+                self.learning_average = self.learning_counter
+                self.learning_average_peak = self.learning_counter
+            else:
+                self.learning_average = round((self.learning_average + self.learning_counter) / 2)
+                if self.learning_average > self.learning_average_peak:
+                    self.learning_average_peak = round((self.learning_average_peak+self.learning_average)/2)
+            self.learning_counter = 0
+        else:
+            self.learning = False
+            self.learning_average_peak = 0
+            self.learing_average = 0
+            self.learning_individuals.clear()
+        
         # Calculate passive boosts for greater stability
         if self.learning_average > 0:
             peak_boost = 0
@@ -403,22 +416,6 @@ class MarkovChain:
             else:
                 logger.info("Attempted to output automatic generation message, but there is not enough learned information yet.")
 
-    def log_learning_statistics(self) -> None:
-        if self.learning_counter > 0:
-            logger.info(f"Learned from {self.learning_counter} new messages")
-            if self.learning_average == 0:
-                self.learning_average = self.learning_counter
-                self.learning_average_peak = self.learning_counter
-            else:
-                self.learning_average = round((self.learning_average + self.learning_counter) / 2)
-                if self.learning_average > self.learning_average_peak:
-                    self.learning_average_peak = round((self.learning_average_peak+self.learning_average)/2)
-            self.learning_counter = 0
-        else:
-            self.learning = False
-            self.learning_average_peak = 0
-            self.learing_average = 0
-            self.learning_individuals.clear()
 
     def check_filter(self, message: str) -> bool:
         """Returns True if message contains a banned word.
