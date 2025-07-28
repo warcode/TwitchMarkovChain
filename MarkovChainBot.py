@@ -185,7 +185,7 @@ class MarkovChain:
                             
                         # If the sentence is too short, ignore it and move on to the next.
                         if len(words) <= self.key_length:
-                            logger.warning(f"Sentence is only {len(words)} long. Skipping.")
+                            logger.warning(f"Sentence {sentence} is only {len(words)} long. Skipping.")
                             continue
                         
                         # Add a new starting point for a sentence to the <START>
