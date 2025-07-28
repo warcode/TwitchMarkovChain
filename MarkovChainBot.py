@@ -142,7 +142,8 @@ class MarkovChain:
                 if ("badges" in m.tags and any(elem in m.tags["badges"] for elem in badges)) or ("vip" in m.tags):
                     # For safety we only learn from users that are likely to post good
                     # This will also filter out most raid messages
-                    logger.info(f"User {m.user.lower()} has badges: {m.tags["badges"]}")
+                    b = m.tags["badges"]
+                    logger.info(f"User {m.user.lower()} has badges: {b}")
                 else:
                     return
 
