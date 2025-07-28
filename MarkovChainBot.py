@@ -380,6 +380,8 @@ class MarkovChain:
             logger.info(f"Learning average is {self.learning_average} and peak is {self.learning_average_peak}")
             self.learning_counter = 0
         else:
+            logger.info(f"Automatically disabling message generation due to inactivity.")
+            self.awake = False
             logger.info(f"Automatically disabling learning because learning counter is {self.learning_counter}")
             self.learning = False
             self.learning_average_peak = 0
