@@ -138,13 +138,15 @@ class MarkovChain:
                         logger.info("Starting learning.")
                     return
 
-                badges = ["bits", "subscriber", "broadcaster", "moderator", "vip"]
-                if ("badges" in m.tags and any(elem in m.tags["badges"] for elem in badges)) or ("vip" in m.tags):
+                badges = ["bits", "subscriber", "broadcaster", "moderator", "vip", "founder"]
+                if "badges" in m.tags and any(elem in m.tags["badges"] for elem in badges):
                     # For safety we only learn from users that are likely to post good
                     # This will also filter out most raid messages
                     b = m.tags["badges"]
                     logger.info(f"User {m.user.lower()} has badges: {b}")
                 else:
+                    b = m.tags["badges"]
+                    logger.info(f"User {m.user.lower()} has badges: {b}")
                     return
 
                 if "emotes" in m.tags:
