@@ -402,12 +402,12 @@ class MarkovChain:
             else:
                 self.generator_counter = round(self.generator_counter + time_boost)
 
+            logger.info(f"Calculated {time_boost} time boost and {peak_boost} peak boost, choosing largest.")
+            logger.info(f"Chat activity counter at {self.generator_counter} out of {self.automatic_generation_message_count}")
+
             # Check if we should generate a message and send it to chat
             if self.generator_counter >= self.automatic_generation_message_count:
                 self.send_activity_generation_message()
-
-            logger.info(f"Calculated {time_boost} time boost and {peak_boost} peak boost, choosing largest.")
-            logger.info(f"Chat activity counter at {self.generator_counter} out of {self.automatic_generation_message_count}")
 
 
     def send_activity_generation_message(self) -> None:
