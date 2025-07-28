@@ -166,6 +166,7 @@ class MarkovChain:
                 
                 else:
                     self.generator_counter = self.generator_counter + 1
+                    self.learning_counter = self.learning_counter + 1
                     
                     # Check if we should generate a message and send it to chat
                     if self.generator_counter >= self.automatic_generation_message_count:
@@ -209,7 +210,7 @@ class MarkovChain:
                             key.append(word)
                         # Add <END> at the end of the sentence
                         self.db.add_rule_queue(key + ["<END>"])
-                        self.learning_counter = self.learning_counter + 1
+                        # We used to increase the learning counter here, but it has been moved for now to make everything else work
 
             elif m.type == "CLEARMSG":
                 # If a message is deleted, its contents will be unlearned
