@@ -32,6 +32,7 @@ class MarkovChain:
         self.learning_average = 0
         self.learning_average_peak = 0
         self.maintenance_timer = None
+        self.allowed_badges = ["bits", "sub-gifter", "subscriber", "broadcaster", "moderator", "vip", "founder", "clips-leader"]
 
         # Fill previously initialised variables with data from the settings.txt file
         Settings(self)
@@ -138,8 +139,7 @@ class MarkovChain:
                         logger.info("Starting learning.")
                     return
 
-                badges = ["bits", "sub-gifter", "subscriber", "broadcaster", "moderator", "vip", "founder", "clips-leader"]
-                if "badges" in m.tags and any(elem in m.tags["badges"] for elem in badges):
+                if "badges" in m.tags and any(elem in m.tags["badges"] for elem in self.allowed_badges):
                     # For safety we only learn from users that are likely to post good
                     # This will also filter out most raid messages
                     b = m.tags["badges"]
