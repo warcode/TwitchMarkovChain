@@ -64,7 +64,7 @@ class MarkovChain:
         self.auth = settings["Authentication"]
         self.denied_users = [user.lower() for user in settings["DeniedUsers"]] + [self.nick.lower()]
         self.allowed_users = [user.lower() for user in settings["AllowedUsers"]]
-        self.key_length = settings["KeyLength"]
+        self.key_length = 2
         self.max_sentence_length = settings["MaxSentenceWordAmount"]
         self.min_sentence_length = settings["MinSentenceWordAmount"]
         self.sent_separator = settings["SentenceSeparator"]
@@ -165,12 +165,16 @@ class MarkovChain:
                     return
                 
                 else:
+                    # Check if we should generate a message and send it to chat
+                    if self.generator_counter >= self.automatic_generation_message_count:
+                        self.send_activity_generation_message()
+
                     # Try to split up sentences. Requires nltk's 'punkt' resource
                     try:
                         sentences = sent_tokenize(m.message.strip())
                     # If 'punkt' is not downloaded, then download it, and retry
                     except:
-                        logger.info(f"Failed to tokenize {m.message}")
+                        logger.warning(f"Failed to tokenize {m.message}")
 
                     for sentence in sentences:
                         # Get all seperate words
@@ -181,6 +185,7 @@ class MarkovChain:
                             
                         # If the sentence is too short, ignore it and move on to the next.
                         if len(words) <= self.key_length:
+                            logger.warning(f"Sentence is only {len(words)} long. Skipping.")
                             continue
                         
                         # Add a new starting point for a sentence to the <START>
@@ -205,8 +210,6 @@ class MarkovChain:
                         self.db.add_rule_queue(key + ["<END>"])
                         self.learning_counter = self.learning_counter + 1
                         self.generator_counter = self.generator_counter + 1
-                        if self.generator_counter >= self.automatic_generation_message_count:
-                            self.send_activity_generation_message()
 
             elif m.type == "CLEARMSG":
                 # If a message is deleted, its contents will be unlearned
@@ -398,6 +401,10 @@ class MarkovChain:
                 self.generator_counter = round(self.generator_counter + peak_boost)
             else:
                 self.generator_counter = round(self.generator_counter + time_boost)
+
+            # Check if we should generate a message and send it to chat
+            if self.generator_counter >= self.automatic_generation_message_count:
+                self.send_activity_generation_message()
 
             logger.info(f"Calculated {time_boost} time boost and {peak_boost} peak boost, choosing largest.")
             logger.info(f"Chat activity counter at {self.generator_counter} out of {self.automatic_generation_message_count}")
