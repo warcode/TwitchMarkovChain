@@ -110,17 +110,19 @@ class MarkovChain:
                         logger.warning(f"[OSError: {error}] upon sending message. Ignoring.")
 
             if m.type == "PRIVMSG":
-
                 # Ignore bot messages
                 if m.user.lower() in self.denied_users:
+                    logger.info(f"Ignoring message. User is denied.")
                     return
 
                 # Ignore the message if it is deemed a command
                 if self.check_if_other_command(m.message):
+                    logger.info(f"Ignoring message. Message is a command.")
                     return
                 
                 # Ignore the message if it contains a link.
                 if self.check_link(m.message):
+                    logger.info(f"Ignoring message. Message contained a link.")
                     return
 
                 # Ignore if learning is paused
@@ -167,12 +169,8 @@ class MarkovChain:
                     try:
                         sentences = sent_tokenize(m.message.strip())
                     # If 'punkt' is not downloaded, then download it, and retry
-                    except LookupError:
-                        logger.debug("Downloading required punkt resource...")
-                        import nltk
-                        nltk.download('punkt')
-                        logger.debug("Downloaded required punkt resource.")
-                        sentences = sent_tokenize(m.message.strip())
+                    except:
+                        logger.info(f"Failed to tokenize {m.message}")
 
                     for sentence in sentences:
                         # Get all seperate words
@@ -220,6 +218,9 @@ class MarkovChain:
                 # If the bot's message was deleted, log this as an error
                 #if m.user.lower() == self.nick.lower():
                 #    logger.error(f"This bot message was deleted: \"{m.message}\"")
+
+            elif m.type == "RECONNECT":
+                logger.info(f"Server has sent RECONNECT")
 
         except Exception as e:
             logger.exception(e)
@@ -364,7 +365,6 @@ class MarkovChain:
         # Handle automatically enabling/disabling learning, as well as statistics
         # If there are no messages in the last 10 minutes we disable learning
         if self.learning_counter > 0:
-            logger.info(f"Learned from {self.learning_counter} new messages")
             if self.learning_average == 0:
                 self.learning_average = self.learning_counter
                 self.learning_average_peak = self.learning_counter
@@ -372,8 +372,11 @@ class MarkovChain:
                 self.learning_average = round((self.learning_average + self.learning_counter) / 2)
                 if self.learning_average > self.learning_average_peak:
                     self.learning_average_peak = round((self.learning_average_peak+self.learning_average)/2)
+            logger.info(f"Learned from {self.learning_counter} new messages")
+            logger.info(f"Learning average is {self.learning_average} and peak is {self.learning_average_peak}")
             self.learning_counter = 0
         else:
+            logger.info(f"Automatically disabling learning because learning counter is {self.learning_counter}")
             self.learning = False
             self.learning_average_peak = 0
             self.learing_average = 0
