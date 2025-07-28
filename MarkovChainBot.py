@@ -165,6 +165,8 @@ class MarkovChain:
                     return
                 
                 else:
+                    self.generator_counter = self.generator_counter + 1
+                    
                     # Check if we should generate a message and send it to chat
                     if self.generator_counter >= self.automatic_generation_message_count:
                         self.send_activity_generation_message()
@@ -185,7 +187,6 @@ class MarkovChain:
                             
                         # If the sentence is too short, ignore it and move on to the next.
                         if len(words) <= self.key_length:
-                            logger.warning(f"Sentence {sentence} is only {len(words)} long. Skipping.")
                             continue
                         
                         # Add a new starting point for a sentence to the <START>
@@ -209,7 +210,6 @@ class MarkovChain:
                         # Add <END> at the end of the sentence
                         self.db.add_rule_queue(key + ["<END>"])
                         self.learning_counter = self.learning_counter + 1
-                        self.generator_counter = self.generator_counter + 1
 
             elif m.type == "CLEARMSG":
                 # If a message is deleted, its contents will be unlearned
