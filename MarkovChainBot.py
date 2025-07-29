@@ -389,12 +389,15 @@ class MarkovChain:
             logger.info(f"Learning average is {self.learning_average} and peak is {self.learning_average_peak}")
             self.learning_counter = 0
         else:
-            logger.info(f"Automatically disabling message generation due to inactivity.")
+            if self.awake:
+                logger.info(f"Automatically disabling message generation due to inactivity.")
+            if self.learning:
+                logger.info(f"Automatically disabling learning because learning counter is {self.learning_counter}")
             self.awake = False
-            logger.info(f"Automatically disabling learning because learning counter is {self.learning_counter}")
+            self.generator_counter = 0
             self.learning = False
             self.learning_average_peak = 0
-            self.learing_average = 0
+            self.learning_average = 0
             self.learning_individuals.clear()
         
         # Calculate passive boosts for greater stability
