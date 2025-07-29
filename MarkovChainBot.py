@@ -71,6 +71,7 @@ class MarkovChain:
         self.sent_separator = settings["SentenceSeparator"]
         self.emote_prefix = settings["EmotePrefix"]
         self.automatic_generation_message_count = settings["AutomaticGenerationMessageCount"]
+        self.autowake = settings["AutoWake"]
 
     def message_handler(self, m: Message):
         try:
@@ -136,7 +137,14 @@ class MarkovChain:
                     if len(self.learning_individuals) >= 3:
                         self.learning = True
                         self.learning_individuals.clear()
-                        logger.info("Starting learning.")
+                        logger.info("Learning started.")
+                        if self.autowake:
+                            self.awake = True
+                            logger.info("(Autowake) Waking up for auto-generating messages.")
+                            try:
+                                self.ws.send_message("NRWylder")
+                            except socket.OSError as error:
+                                logger.warning(f"[OSError: {error}] upon sending message. Ignoring.")
                     return
 
                 if "badges" in m.tags and any(elem in m.tags["badges"] for elem in self.allowed_badges):
