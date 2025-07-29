@@ -21,6 +21,7 @@ class SettingsData(TypedDict):
     SentenceSeparator: str
     EmotePrefix : str
     AutomaticGenerationMessageCount : int
+    AutoWake : bool
 
 class Settings:
     """ Loads data from settings.json into the bot """
@@ -40,7 +41,8 @@ class Settings:
         "MinSentenceWordAmount": -1,
         "SentenceSeparator": ". ",
         "EmotePrefix": "NA",
-        "AutomaticGenerationMessageCount": 150
+        "AutomaticGenerationMessageCount": 150,
+        "AutoWake": False
     }
 
     def __init__(self, bot) -> None:
