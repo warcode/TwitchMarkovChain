@@ -147,6 +147,14 @@ class MarkovChain:
                                 logger.warning(f"[OSError: {error}] upon sending message. Ignoring.")
                     return
 
+                # Count activity 
+                self.generator_counter = self.generator_counter + 1
+                
+                # Check if we should generate a message and send it to chat
+                if self.generator_counter >= self.automatic_generation_message_count:
+                    self.send_activity_generation_message()
+
+                # Limit learning to only chatters with set badges
                 if "badges" in m.tags and any(elem in m.tags["badges"] for elem in self.allowed_badges):
                     # For safety we only learn from users that are likely to post good
                     # This will also filter out most raid messages
@@ -182,13 +190,9 @@ class MarkovChain:
                     return
                 
                 else:
-                    self.generator_counter = self.generator_counter + 1
+                    # Average activity is left here so that raids don't spike the averages
                     self.learning_counter = self.learning_counter + 1
                     
-                    # Check if we should generate a message and send it to chat
-                    if self.generator_counter >= self.automatic_generation_message_count:
-                        self.send_activity_generation_message()
-
                     # Try to split up sentences. Requires nltk's 'punkt' resource
                     try:
                         sentences = sent_tokenize(m.message.strip())
