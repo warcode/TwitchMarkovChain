@@ -174,7 +174,7 @@ class MarkovChain:
                             else:
                                 if not n.startswith(self.emote_prefix) or name[-3:] in mods:
                                     m.message = m.message.replace(n, "")
-                                    logger.info("Stripped emote: " + n)
+                                    # logger.info("Stripped emote: " + n)
                     
                 # Ignore the message if any word in the sentence is on the ban filter
                 if self.check_filter(m.message):
