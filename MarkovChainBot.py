@@ -444,7 +444,11 @@ class MarkovChain:
         if self.awake:
             sentence, success = self.generate()
             if success:
-                logger.info(sentence)
+                # Fixing trailing periods so they arent spaced
+                sentence = re.sub(r'\s+(\.+)', r'\1', sentence)
+                # Reducing any trailing periods down to a maximum of 3
+                sentence = re.sub(r'\.{4,}', '...', sentence)
+                logger.info(f"Generated: {sentence}")
                 # Try to send a message. Just log a warning on fail
                 try:
                     self.ws.send_message(sentence)
