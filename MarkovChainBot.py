@@ -50,7 +50,7 @@ class MarkovChain:
                                   callback=self.message_handler,
                                   capability=["commands", "tags"],
                                   live=True)
-        self.ws.start_bot()
+        self.ws.start_blocking()
 
     def set_settings(self, settings: SettingsData):
         """Fill class instance attributes based on the settings file.
@@ -246,6 +246,7 @@ class MarkovChain:
 
             elif m.type == "RECONNECT":
                 logger.info(f"Server has sent RECONNECT")
+                self.ws.connect()
 
         except Exception as e:
             logger.exception(e)
