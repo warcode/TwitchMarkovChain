@@ -111,6 +111,14 @@ class MarkovChain:
                     except socket.OSError as error:
                         logger.warning(f"[OSError: {error}] upon sending message. Ignoring.")
 
+            
+            if m.type == "USERNOTICE" and "msg-id" in m.tags and m.tags["msg-id"] == "submysterygift":
+                if "msg-param-mass-gift-count" in m.tags:
+                    count = int(m.tags["msg-param-mass-gift-count"])
+                    increment = round((self.automatic_generation_message_count / 2) * count)
+                    self.generator_counter = self.generator_counter + increment
+                    logger.info(f"Subgifts: {count}. Increased by {increment}, counter is now {self.generator_counter}.")
+
             if m.type == "PRIVMSG":
                 # Ignore bot messages
                 if m.user.lower() in self.denied_users:
