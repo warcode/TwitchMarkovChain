@@ -113,7 +113,11 @@ class MarkovChain:
 
                 elif m.message.startswith("!forget") and self.check_if_permissions(m):
                     forgettable = m.message[len("!forget"):].strip()
-                    self.db.unlearn(forgettable)
+                    logger.info(f"Attempting to forget: {forgettable}")
+                    try:
+                        self.db.unlearn(forgettable)
+                    except Exception as e:
+                        logger.exception(f"Failed to forget '{forgettable}'")
 
             
             if m.type == "USERNOTICE" and "msg-id" in m.tags and m.tags["msg-id"] == "submysterygift":
