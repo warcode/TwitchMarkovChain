@@ -111,6 +111,10 @@ class MarkovChain:
                     except socket.OSError as error:
                         logger.warning(f"[OSError: {error}] upon sending message. Ignoring.")
 
+                elif m.message.startswith("!forget") and self.check_if_permissions(m):
+                    forgettable = m.message[len("!forget"):].strip()
+                    self.db.unlearn(forgettable)
+
             
             if m.type == "USERNOTICE" and "msg-id" in m.tags and m.tags["msg-id"] == "submysterygift":
                 if "msg-param-mass-gift-count" in m.tags:
@@ -122,17 +126,17 @@ class MarkovChain:
             if m.type == "PRIVMSG":
                 # Ignore bot messages
                 if m.user.lower() in self.denied_users:
-                    logger.info(f"Ignoring message. User is denied.")
+                    #logger.info(f"Ignoring message. User is denied.")
                     return
 
                 # Ignore the message if it is deemed a command
                 if self.check_if_other_command(m.message):
-                    logger.info(f"Ignoring message. Message is a command.")
+                    #logger.info(f"Ignoring message. Message is a command.")
                     return
                 
                 # Ignore the message if it contains a link.
                 if self.check_link(m.message):
-                    logger.info(f"Ignoring message. Message contained a link.")
+                    #logger.info(f"Ignoring message. Message contained a link.")
                     return
 
                 # Ignore if learning is paused
