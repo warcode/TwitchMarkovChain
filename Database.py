@@ -842,3 +842,34 @@ class Database:
                                    values=(word1, word2, word3, ))
 
         self.execute_commit()
+
+    def purge_word(self, target_word: str) -> None:
+        target_word = target_word.strip()
+        suffixes = [chr(c) for c in range(ord('A'), ord('Z') + 1)] + ["_"]
+    
+        for s1 in suffixes:
+            for s2 in suffixes:
+                table = f"MarkovGrammar{s1}{s2}"
+                try:
+                    self.add_execute_queue(
+                        f"DELETE FROM {table} WHERE word1=? OR word2=? OR word3=?;",
+                        (target_word, target_word, target_word)
+                    )
+                except Exception:
+                    continue
+    
+        for s in suffixes:
+            table = f"MarkovStart{s}"
+            try:
+                self.add_execute_queue(
+                    f"DELETE FROM {table} WHERE word1=? OR word2=?;",
+                    (target_word, target_word)
+                )
+            except Exception:
+                continue
+    
+        try:
+            result = self.execute_commit()
+            logger.info(f"purge_word('{target_word}') result: {result}")
+        except Exception as e:
+            logger.error(f"Error executing purge_word('{target_word}'): {e}")
