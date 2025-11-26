@@ -119,6 +119,14 @@ class MarkovChain:
                     except Exception as e:
                         logger.exception(f"Failed to forget '{forgettable}'")
 
+                elif m.message.startswith("!purge") and self.check_if_permissions(m):
+                    purged = m.message[len("!purge"):].strip()
+                    logger.info(f"Attempting to purge: {purged}")
+                    try:
+                        self.db.purge_word(purged)
+                    except Exception as e:
+                        logger.exception(f"Failed to purge '{purged}'")
+
             
             if m.type == "USERNOTICE" and "msg-id" in m.tags and m.tags["msg-id"] == "submysterygift":
                 if "msg-param-mass-gift-count" in m.tags:
