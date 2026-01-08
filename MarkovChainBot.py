@@ -99,7 +99,7 @@ class MarkovChain:
                     self.awake = True
                     logger.info("Waking up for auto-generating messages.")
                     try:
-                        self.ws.send_message("NRWylder")
+                        self.ws.send_message("PowerUpR")
                     except socket.OSError as error:
                         logger.warning(f"[OSError: {error}] upon sending message. Ignoring.")
                 
@@ -166,7 +166,7 @@ class MarkovChain:
                             self.awake = True
                             logger.info("(Autowake) Waking up for auto-generating messages.")
                             try:
-                                self.ws.send_message("NRWylder")
+                                self.ws.send_message("PowerUpR")
                             except socket.OSError as error:
                                 logger.warning(f"[OSError: {error}] upon sending message. Ignoring.")
                     return
