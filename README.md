@@ -12,6 +12,7 @@ The only functioning commands are `!wakeup` and `!sleep` to start/stop sending m
 
 Set the allowed `EmotePrefix` and `AutomaticGenerationMessageCount` to number of chat messages between posts in the settings.
 
+
 ---
 
 ## docker-compose ++
