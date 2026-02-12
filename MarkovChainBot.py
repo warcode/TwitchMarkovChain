@@ -476,7 +476,8 @@ class MarkovChain:
                 # Remove any periods after !? or in between !?
                 sentence = re.sub(r'(?<=[!?])\.+', '', sentence)
                 # Remove any " or '
-                sentence = re.sub(r"[\"']", "", sentence)
+                sentence = re.sub(r'"', '', sentence)
+                sentence = re.sub(r'(?<!\w)\'|\'(?!\w)', '', sentence)
                 logger.info(f"Generated: {sentence}")
                 # Try to send a message. Just log a warning on fail
                 try:
