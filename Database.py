@@ -720,9 +720,7 @@ class Database:
             List[str]: A list of two starting words, such as ["I", "am"].
         """
         # Find one character start from
-        character = random.choices(list(string.ascii_lowercase) + ["_"],
-                                   weights=self.word_frequency,
-                                   k=1)[0]
+        character = random.choices(list(string.ascii_lowercase) + ["_"], weights=self.word_frequency, k=1)[0]
 
         # Get all first word, second word, frequency triples,
         # e.g. [("I", "am", 3), ("You", "are", 2), ...]
@@ -735,9 +733,35 @@ class Database:
             return []
 
         # Return a (weighted) randomly chosen 2-gram
-        return list(random.choices(data,
-                                   weights=[tup[-1] for tup in data],
-                                   k=1)[0][:-1])
+        return list(random.choices(data, weights=[tup[-1] for tup in data], k=1)[0][:-1])
+
+    def get_start_uniform(self) -> List[str]:
+        """Same as get_start, but using a more uniform distribution
+        """
+
+        weights = self.word_frequency
+        average = sum(weights) / len(weights)
+
+        word_frequency_uniform = [
+            weight * 0.75 + average * 0.25
+            for weight in weights
+        ]
+        
+        # Find one character start from
+        character = random.choices(list(string.ascii_lowercase) + ["_"], weights=word_frequency_uniform, k=1)[0]
+
+        # Get all first word, second word, frequency triples,
+        # e.g. [("I", "am", 3), ("You", "are", 2), ...]
+        data = self.execute(
+            f"SELECT * FROM MarkovStart{character};",
+            fetch=True)
+
+        # If nothing has ever been said
+        if len(data) == 0:
+            return []
+
+        # Return a (weighted) randomly chosen 2-gram
+        return list(random.choices(data, weights=[tup[-1] for tup in data], k=1)[0][:-1])
 
     def add_rule_queue(self, item: List[str]) -> None:
         """Adds a rule to the queue, ready to be entered into the knowledge base, given a 3-gram `item`.
