@@ -319,7 +319,9 @@ class MarkovChain:
 
         else: # if there are no params
             # Get starting key
-            key = self.db.get_start()
+            # key = self.db.get_start()
+            # Use a more uniform starting character distribution to see if we get more different sentences
+            key = self.db.get_start_uniform()
             if key:
                 # Copy this for the sentence
                 sentences[0] = key.copy()
