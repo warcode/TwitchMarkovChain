@@ -743,7 +743,7 @@ class Database:
         average = sum(weights) / len(weights)
 
         word_frequency_uniform = [
-            round((weight * 0.7) + (average * 0.3), 2)
+            round((weight * 0.6) + (average * 0.4), 2)
             for weight in weights
         ]
         
