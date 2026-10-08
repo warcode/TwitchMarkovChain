@@ -481,6 +481,9 @@ class MarkovChain:
                 sentence = re.sub(r'"', '', sentence)
                 sentence = re.sub(r'(?<!\w)\'|\'(?!\w)', '', sentence)
                 logger.info(f"Generated: {sentence}")
+                # Remove leftover parenthesis
+                sentence = re.sub(r'\(([\w]+)\b(?!\))', r'\1', sentence)
+                sentence = re.sub(r'(?<![\w(])(\w+(?:\s+\w+)*)\)', r'\1', sentence)
                 # Try to send a message. Just log a warning on fail
                 try:
                     self.ws.send_message(sentence)
