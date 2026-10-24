@@ -746,6 +746,8 @@ class Database:
             round((weight * 0.6) + (average * 0.4), 2)
             for weight in weights
         ]
+
+        word_frequency_uniform[17] = word_frequency_uniform[17] + 7.0
         
         # Find one character start from
         character = random.choices(list(string.ascii_lowercase) + ["_"], weights=word_frequency_uniform, k=1)[0]
